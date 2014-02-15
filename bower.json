@@ -1,0 +1,13 @@
+{
+    "name": "templates-bench",
+    "version": "0.0.0",
+    "description": "Templates benchmakrs",
+    "ignore": [
+        ".bem/cache",
+        "node_modules",
+        "libs"
+    ],
+    "dependencies": {
+        "bem-core": "git://github.com/bem/bem-core.git#~1.1.0"
+    }
+}
