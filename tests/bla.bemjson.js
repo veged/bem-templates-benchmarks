@@ -1,1 +1,1 @@
-module.exports = function() { return { block: 'bla' } };
+module.exports = function(rnd) { return { block: rnd('block') } };

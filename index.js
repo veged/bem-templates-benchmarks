@@ -16,7 +16,7 @@ function createSuite(suiteName) {
     var suite = new Benchmark.Suite,
         suitePrefix = './tests/' + suiteName + '.',
         bemjsonPath = suitePrefix + 'bemjson.js',
-        bemjson = require(bemjsonPath),
+        bemjson = new BEMJSON(bemjsonPath),
         bemhtmlPath = suitePrefix + 'bemhtml',
         bemhtml = BEM_XJST.compile(
             FS.readFileSync('libs/bem-core/common.blocks/i-bem/i-bem.bemhtml') +
@@ -24,12 +24,13 @@ function createSuite(suiteName) {
             {}),
         bhPath = suitePrefix + 'bh.js',
         bh = require(bhPath)(new BH()),
+        bemjson0 = bemjson(),
         results = {
-            bemhtml: bemhtml.apply(bemjson()),
-            bh: bh.apply(bemjson())
+            bemhtml: bemhtml.apply(bemjson0),
+            bh: bh.apply(bemjson0)
         };
 
-    console.log('== Create suite ' + suiteName + ' (' + bemjsonPath + ')');
+    console.log('== Create suite "' + suiteName + '" (' + bemjsonPath + ')');
 
     ASSERT.equal(results.bemhtml, results.bh, 'BEMHTML: ' + results.bemhtml + '\n\nBH: ' + results.bh + '\n\n');
     process.env.ENV == 'development' && console.log('RESULT: ' + results.bemhtml + '\n\n');
@@ -45,8 +46,23 @@ function createSuite(suiteName) {
             console.log(String(event.target));
         })
         .on('complete', function() {
-            console.log('Fastest is ' + this.filter('fastest').pluck('name') + '\n');
-            console.log(bemhtmlCount, bhCount);
+            console.log('Fastest ' + this.filter('fastest').pluck('name') + '\n');
         })
         .run();
+}
+
+function BEMJSON(path, count) {
+    count || (count = 1000);
+    var generator = require(path),
+        i = count,
+        variants = [],
+        rndCount = 0;
+        rnd = function(prefix) { return (prefix || 'rnd') + ++rndCount };
+
+    while(i--) variants.push(generator(rnd));
+
+    return function() {
+        ++i < count || (i = 0);
+        return variants[i];
+    }
 }
