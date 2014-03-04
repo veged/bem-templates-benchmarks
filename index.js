@@ -1,9 +1,6 @@
 var FS = require('fs'),
     ASSERT = require('assert'),
-    Benchmark = require('benchmark'),
-    BEM_XJST = require('bem-xjst'),
-    BH = require('bh').BH;
-
+    Benchmark = require('benchmark');
 
 FS.readdirSync('./tests').forEach(function(path) {
     var match = path.match(/(.*)\.bemjson.js$/);
@@ -16,14 +13,11 @@ function createSuite(suiteName) {
     var suite = new Benchmark.Suite,
         suitePrefix = './tests/' + suiteName + '.',
         bemjsonPath = suitePrefix + 'bemjson.js',
-        bemjson = new BEMJSON(bemjsonPath),
+        bemjson = BEMJSON(bemjsonPath),
         bemhtmlPath = suitePrefix + 'bemhtml',
-        bemhtml = BEM_XJST.compile(
-            FS.readFileSync('libs/bem-core/common.blocks/i-bem/i-bem.bemhtml') +
-                FS.readFileSync(bemhtmlPath),
-            {}),
-        bhPath = suitePrefix + 'bh.js',
-        bh = require(bhPath)(new BH()),
+        bemhtml = BEMHTML(bemhtmlPath),
+        bhPath = suitePrefix + 'bh',
+        bh = BH(bhPath),
         bemjson0 = bemjson(),
         results = {
             bemhtml: bemhtml.apply(bemjson0),
@@ -32,7 +26,7 @@ function createSuite(suiteName) {
 
     console.log('== Create suite "' + suiteName + '" (' + bemjsonPath + ')');
 
-    ASSERT.equal(results.bemhtml, results.bh, 'BEMHTML: ' + results.bemhtml + '\n\nBH: ' + results.bh + '\n\n');
+    //ASSERT.equal(results.bemhtml, results.bh, 'BEMHTML: ' + results.bemhtml + '\n\nBH: ' + results.bh + '\n\n');
     process.env.ENV == 'development' && console.log('RESULT: ' + results.bemhtml + '\n\n');
 
     suite
@@ -65,4 +59,21 @@ function BEMJSON(path, count) {
         ++i < count || (i = 0);
         return variants[i];
     }
+}
+
+function BEMHTML(path) {
+    if(FS.existsSync(path))
+        return require('bem-xjst').compile(
+            FS.readFileSync('libs/bem-core/common.blocks/i-bem/i-bem.bemhtml') +
+                FS.readFileSync(path),
+            {});
+
+    return require(path + '.js').BEMHTML
+}
+
+function BH(path) {
+    if(FS.existsSync(path))
+        return require(path)(new (require('bh').BH)());
+
+    return require(path + '.js')
 }
