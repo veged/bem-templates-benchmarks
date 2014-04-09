@@ -2,12 +2,12 @@ var FS = require('fs'),
     ASSERT = require('assert'),
     Benchmark = require('benchmark');
 
-FS.readdirSync('./tests').forEach(function(path) {
-    var match = path.match(/(.*)\.bemjson.js$/);
-    if(match) {
-        createSuite(match[1]);
-    }
-});
+process.argv[2] ?
+    createSuite(process.argv[2]) :
+    FS.readdirSync('./tests').forEach(function(path) {
+        var match = path.match(/(.*)\.bemjson.js$/);
+        match && createSuite(match[1]);
+    });
 
 function createSuite(suiteName) {
     var suite = new Benchmark.Suite,
@@ -62,11 +62,27 @@ function BEMJSON(path, count) {
 }
 
 function BEMHTML(path) {
-    if(FS.existsSync(path))
-        return require('bem-xjst').compile(
-            FS.readFileSync('libs/bem-core/common.blocks/i-bem/i-bem.bemhtml') +
-                FS.readFileSync(path),
-            {});
+    var BEMHTML = require('bem-xjst/lib/bemhtml'),
+        jsPath = path + '.js';
+
+    if(FS.existsSync(path)) {
+        var source = FS.readFileSync('libs/bem-core/common.blocks/i-bem/i-bem.bemhtml') + FS.readFileSync(path);
+
+        FS.writeFileSync(
+            jsPath,
+            BEMHTML.generate(
+                source,
+                {
+                    wrap: true,
+                    exportName: 'BEMHTML',
+                    optimize: true,
+                    cache: false
+                }
+            )
+        );
+
+        return BEMHTML.compile(source, {});
+    }
 
     return require(path + '.js').BEMHTML
 }
