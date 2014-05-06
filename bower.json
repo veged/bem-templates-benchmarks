@@ -8,6 +8,6 @@
         "libs"
     ],
     "dependencies": {
-        "bem-core": "git://github.com/bem/bem-core.git#~1.1.0"
+        "bem-core": "git://github.com/bem/bem-core.git#~2.2.1"
     }
 }
