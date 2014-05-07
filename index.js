@@ -1,6 +1,8 @@
 var FS = require('fs'),
     ASSERT = require('assert'),
-    Benchmark = require('benchmark');
+    Benchmark = require('benchmark'),
+    htmlDiffer = require('html-differ'),
+    diffLogger = require('html-differ/lib/diff-logger');
 
 process.argv[2] ?
     createSuite(process.argv[2]) :
@@ -28,6 +30,7 @@ function createSuite(suiteName) {
 
     //ASSERT.equal(results.bemhtml, results.bh, 'BEMHTML: ' + results.bemhtml + '\n\nBH: ' + results.bh + '\n\n');
     process.env.ENV == 'development' && console.log('RESULT: ' + results.bemhtml + '\n\n');
+    process.env.ENV == 'development' && diffLogger.log(htmlDiffer.diffHtml(results.bemhtml, results.bh, { ignoreHtmlAttrs: ['id', 'for'] } ));
 
     suite
         .add('-- bemhtml (' + bemhtmlPath + ')', function() {
