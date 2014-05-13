@@ -30,7 +30,7 @@ function createSuite(suiteName) {
 
     //ASSERT.equal(results.bemhtml, results.bh, 'BEMHTML: ' + results.bemhtml + '\n\nBH: ' + results.bh + '\n\n');
     process.env.ENV == 'development' && console.log('RESULT: ' + results.bemhtml + '\n\n');
-    process.env.ENV == 'development' && diffLogger.log(htmlDiffer.diffHtml(results.bemhtml, results.bh, { ignoreHtmlAttrs: ['id', 'for'] } ));
+    process.env.ENV == 'development' && htmlDiffer.bemDiff(results.bemhtml, results.bh);
 
     suite
         .add('-- bemhtml (' + bemhtmlPath + ')', function() {
