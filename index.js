@@ -1,8 +1,7 @@
 var FS = require('fs'),
     ASSERT = require('assert'),
     Benchmark = require('benchmark'),
-    htmlDiffer = require('html-differ'),
-    diffLogger = require('html-differ/lib/diff-logger');
+    htmlDiffer = require('html-differ');
 
 process.argv[2] ?
     createSuite(process.argv[2]) :
